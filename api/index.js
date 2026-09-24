@@ -106,7 +106,7 @@ module.exports = async (req, res) => {
   // Arco semicircular superior
   const segments = 14;
   const startAngle = 200;
-  const endAngle = 340;
+  const endAngle = 320;
 
   const outerRadius = 132;
   const innerRadius = 108;
