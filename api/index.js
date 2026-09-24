@@ -91,31 +91,53 @@ module.exports = async (req, res) => {
   const fullTextW = tw(fullText, fontSize);
   const iconW     = showIcon ? iconSize : 0;
 
-    // ==============================
-  // VISUAL NEON DO CONTADOR
+  // ==============================
+  // VISUAL NEON DO CONTADOR - V2
   // ==============================
 
   const width = 520;
-  const height = 190;
+  const height = 210;
 
   const centerX = width / 2;
-  const centerY = 105;
 
-  const segments = 12;
+  // Centro do arco
+  const gaugeCenterY = 145;
+
+  // Arco semicircular superior
+  const segments = 14;
+  const startAngle = 200;
+  const endAngle = 340;
+
+  const outerRadius = 125;
+  const innerRadius = 103;
+
+  // Quantidade de segmentos acesos
   const activeSegments = Math.min(segments, rawCount);
 
   let gauge = '';
 
   for (let i = 0; i < segments; i++) {
-    const angle = 200 + (160 / (segments - 1)) * i;
+    const angle =
+      startAngle +
+      ((endAngle - startAngle) / (segments - 1)) * i;
 
     const rad = angle * Math.PI / 180;
 
-    const x1 = centerX + Math.cos(rad) * 125;
-    const y1 = centerY + Math.sin(rad) * 125;
+    const x1 =
+      centerX +
+      Math.cos(rad) * innerRadius;
 
-    const x2 = centerX + Math.cos(rad) * 150;
-    const y2 = centerY + Math.sin(rad) * 150;
+    const y1 =
+      gaugeCenterY +
+      Math.sin(rad) * innerRadius;
+
+    const x2 =
+      centerX +
+      Math.cos(rad) * outerRadius;
+
+    const y2 =
+      gaugeCenterY +
+      Math.sin(rad) * outerRadius;
 
     const active = i < activeSegments;
 
@@ -125,53 +147,81 @@ module.exports = async (req, res) => {
         y1="${y1}"
         x2="${x2}"
         y2="${y2}"
-        stroke="${active ? '#b56cff' : '#332044'}"
-        stroke-width="6"
+        stroke="${active ? '#b56cff' : '#321d48'}"
+        stroke-width="7"
         stroke-linecap="round"
-        opacity="${active ? '1' : '0.65'}"
-      />`;
+        opacity="${active ? '1' : '0.75'}"
+        ${active ? 'filter="url(#glow)"' : ''}
+      />
+    `;
   }
 
   const svgContent = `
     <defs>
 
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="4" result="blur"/>
+      <!-- Brilho neon -->
+      <filter id="glow"
+              x="-100%"
+              y="-100%"
+              width="300%"
+              height="300%">
+
+        <feGaussianBlur
+          stdDeviation="4"
+          result="blur"/>
+
         <feMerge>
           <feMergeNode in="blur"/>
           <feMergeNode in="SourceGraphic"/>
         </feMerge>
+
       </filter>
 
-      <linearGradient id="purpleGradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%">
-        <stop offset="0%" stop-color="#7a3cff"/>
-        <stop offset="50%" stop-color="#c77dff"/>
-        <stop offset="100%" stop-color="#7a3cff"/>
+      <!-- Gradiente roxo -->
+      <linearGradient
+        id="purpleGradient"
+        x1="0%"
+        y1="0%"
+        x2="100%"
+        y2="0%">
+
+        <stop
+          offset="0%"
+          stop-color="#7a3cff"/>
+
+        <stop
+          offset="50%"
+          stop-color="#d18aff"/>
+
+        <stop
+          offset="100%"
+          stop-color="#7a3cff"/>
+
       </linearGradient>
 
     </defs>
 
-    <!-- Fundo -->
+
+    <!-- FUNDO -->
+
     <rect
       x="2"
       y="2"
       width="${width - 4}"
       height="${height - 4}"
-      rx="18"
-      fill="#0d0b12"
-      stroke="#29183d"
+      rx="20"
+      fill="#0c0911"
+      stroke="#321d48"
       stroke-width="2"
     />
 
-    <!-- Linha superior -->
+
+    <!-- LINHAS SUPERIORES -->
+
     <line
       x1="35"
       y1="25"
-      x2="175"
+      x2="180"
       y2="25"
       stroke="url(#purpleGradient)"
       stroke-width="2"
@@ -179,7 +229,7 @@ module.exports = async (req, res) => {
     />
 
     <line
-      x1="${width - 175}"
+      x1="${width - 180}"
       y1="25"
       x2="${width - 35}"
       y2="25"
@@ -188,41 +238,48 @@ module.exports = async (req, res) => {
       opacity="0.8"
     />
 
-    <!-- Brilho da linha -->
-    <line
-      x1="35"
-      y1="25"
-      x2="175"
-      y2="25"
-      stroke="#b56cff"
-      stroke-width="4"
-      opacity="0.25"
+
+    <!-- PEQUENOS DETALHES NAS EXTREMIDADES -->
+
+    <circle
+      cx="32"
+      cy="25"
+      r="2"
+      fill="#b56cff"
       filter="url(#glow)"
     />
 
-    <line
-      x1="${width - 175}"
-      y1="25"
-      x2="${width - 35}"
-      y2="25"
-      stroke="#b56cff"
-      stroke-width="4"
-      opacity="0.25"
+    <circle
+      cx="${width - 32}"
+      cy="25"
+      r="2"
+      fill="#b56cff"
       filter="url(#glow)"
     />
 
-    <!-- Arco segmentado -->
-    <g filter="url(#glow)">
+
+    <!-- ARCO NEON -->
+
+    <g>
       ${gauge}
     </g>
 
-    <!-- Olho -->
-    <g transform="translate(${centerX - 18}, 55) scale(1.5)">
+
+    <!-- OLHO -->
+
+    <g
+      transform="
+        translate(${centerX - 18}, 68)
+        scale(1.5)
+      "
+      filter="url(#glow)"
+    >
+
       <path
         d="${eyePath}"
         fill="none"
         stroke="#c77dff"
-        stroke-width="1.5"
+        stroke-width="1.6"
       />
 
       <circle
@@ -231,64 +288,78 @@ module.exports = async (req, res) => {
         r="3"
         fill="#c77dff"
       />
+
     </g>
 
-    <!-- Número -->
+
+    <!-- NÚMERO -->
+
     <text
       x="${centerX}"
-      y="128"
+      y="139"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
       font-size="38"
       font-weight="700"
-      fill="#ffffff"
-    >
+      fill="#ffffff">
+
       ${countStr}
+
     </text>
 
-    <!-- Label -->
+
+    <!-- TÍTULO -->
+
     <text
       x="${centerX}"
-      y="153"
+      y="164"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
       font-size="11"
       font-weight="600"
       letter-spacing="3"
-      fill="#b56cff"
-    >
+      fill="#b56cff">
+
       VISUALIZAÇÕES DO PERFIL
+
     </text>
 
-    <!-- Linha inferior -->
+
+    <!-- LINHA INFERIOR -->
+
     <line
-      x1="115"
-      y1="169"
-      x2="405"
-      y2="169"
+      x1="120"
+      y1="183"
+      x2="400"
+      y2="183"
       stroke="url(#purpleGradient)"
       stroke-width="1.5"
-      opacity="0.7"
-    />
-
-    <!-- Pequenos detalhes laterais -->
-    <circle
-      cx="95"
-      cy="169"
-      r="2"
-      fill="#b56cff"
+      opacity="0.75"
     />
 
     <circle
-      cx="425"
-      cy="169"
+      cx="100"
+      cy="183"
       r="2"
       fill="#b56cff"
+      filter="url(#glow)"
     />
+
+    <circle
+      cx="420"
+      cy="183"
+      r="2"
+      fill="#b56cff"
+      filter="url(#glow)"
+    />
+
   `;
 
   res.setHeader('Content-Type', 'image/svg+xml');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader(
+    'Cache-Control',
+    'no-cache, no-store, must-revalidate'
+  );
 
   res.send(`
     <svg
@@ -297,7 +368,8 @@ module.exports = async (req, res) => {
       height="${height}"
       viewBox="0 0 ${width} ${height}"
     >
+
       ${svgContent}
+
     </svg>
   `);
-};
