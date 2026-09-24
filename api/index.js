@@ -91,76 +91,229 @@ module.exports = async (req, res) => {
   const fullTextW = tw(fullText, fontSize);
   const iconW     = showIcon ? iconSize : 0;
 
-  let svgContent = '';
-  let totalW, totalH;
+    // ==============================
+  // VISUAL NEON DO CONTADOR
+  // ==============================
 
-  // ── VERTICAL ─────────────────────────────────────────────────
-  if (isVertical) {
-    const contentW = Math.max(iconW, fullTextW);
-    totalW = contentW + padX * 2;
+  const width = 520;
+  const height = 190;
 
-    let curY = padY;
-    const iconY_v = curY;
-    if (showIcon) curY += iconSize + 4;
-    const textY_v = curY + fontSize * 0.85;
-    curY += fontSize;
-    totalH = curY + padY;
+  const centerX = width / 2;
+  const centerY = 105;
 
-    const bgLayer = isNobg ? '' :
-      `<rect x="0" y="0" width="${totalW}" height="${totalH}" rx="${r}" ry="${r}" fill="${bgColor}"/>`;
+  const segments = 12;
+  const activeSegments = Math.min(segments, rawCount);
 
-    svgContent = `
-      ${bgLayer}
-      ${showIcon ? `<svg x="${(totalW - iconSize) / 2}" y="${iconY_v}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="${iconColor}"><path d="${eyePath}"/></svg>` : ''}
-      <text x="${totalW / 2}" y="${textY_v}" text-anchor="middle" font-family="monospace" font-size="${fontSize}">
-        ${showLabel ? `<tspan fill="${labelColor}">${labelText} </tspan>` : ''}
-        <tspan fill="${countColor}" font-weight="bold">${countStr}</tspan>
-      </text>`;
+  let gauge = '';
 
-  // ── SPLIT ────────────────────────────────────────────────────
-  } else if (isSplit) {
-    const labelOnlyW    = showLabel ? tw(labelText, fontSize) : 0;
-    const countOnlyW    = tw(countStr, fontSize);
-    const labelSectionW = padX + iconW + iconGap + labelOnlyW;
-    const countSectionW = padX + countOnlyW + padX;
-    totalW = labelSectionW + countSectionW;
-    totalH = Math.max(iconSize, fontSize) + padY * 2;
-    const midY  = totalH / 2;
-    const textY = midY + fontSize * 0.35;
-    const iconY = midY - iconSize / 2;
+  for (let i = 0; i < segments; i++) {
+    const angle = 200 + (160 / (segments - 1)) * i;
 
-    const leftBg  = `M${r},0 H${labelSectionW} V${totalH} H${r} Q0,${totalH} 0,${totalH - r} V${r} Q0,0 ${r},0 Z`;
-    const rightBg = `M${labelSectionW},0 H${totalW - r} Q${totalW},0 ${totalW},${r} V${totalH - r} Q${totalW},${totalH} ${totalW - r},${totalH} H${labelSectionW} Z`;
+    const rad = angle * Math.PI / 180;
 
-    svgContent = `
-      <path d="${leftBg}" fill="${labelBgColor}"/>
-      <path d="${rightBg}" fill="${bgColor}"/>
-      ${showIcon ? `<svg x="${padX}" y="${iconY}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="${iconColor}"><path d="${eyePath}"/></svg>` : ''}
-      ${showLabel ? `<text x="${padX + iconW + iconGap}" y="${textY}" font-family="monospace" font-size="${fontSize}" fill="${labelColor}">${labelText}</text>` : ''}
-      <text x="${labelSectionW + padX}" y="${textY}" font-family="monospace" font-size="${fontSize}" font-weight="bold" fill="${countColor}">${countStr}</text>`;
+    const x1 = centerX + Math.cos(rad) * 125;
+    const y1 = centerY + Math.sin(rad) * 125;
 
-  // ── HORIZONTAL (default) ──────────────────────────────────────
-  } else {
-    totalW = iconW + iconGap + fullTextW + padX * 2;
-    totalH = Math.max(iconSize, fontSize) + padY * 2;
-    const midY  = totalH / 2;
-    const textY = midY + fontSize * 0.35;
-    const iconY = midY - iconSize / 2;
-    const textX = padX + iconW + iconGap;
+    const x2 = centerX + Math.cos(rad) * 150;
+    const y2 = centerY + Math.sin(rad) * 150;
 
-    const bgLayer = isNobg ? '' :
-      `<rect x="0" y="0" width="${totalW}" height="${totalH}" rx="${r}" ry="${r}" fill="${bgColor}"/>`;
+    const active = i < activeSegments;
 
-    svgContent = `
-      ${bgLayer}
-      ${showIcon ? `<svg x="${padX}" y="${iconY}" width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="${iconColor}"><path d="${eyePath}"/></svg>` : ''}
-      <text x="${textX}" y="${textY}" font-family="monospace" font-size="${fontSize}">
-        ${showLabel ? `<tspan fill="${labelColor}">${labelText} </tspan>` : ''}
-        <tspan fill="${countColor}" font-weight="bold">${countStr}</tspan>
-      </text>`;
+    gauge += `
+      <line
+        x1="${x1}"
+        y1="${y1}"
+        x2="${x2}"
+        y2="${y2}"
+        stroke="${active ? '#b56cff' : '#332044'}"
+        stroke-width="6"
+        stroke-linecap="round"
+        opacity="${active ? '1' : '0.65'}"
+      />`;
   }
+
+  const eyePath = `
+    M12 4.5
+    C7 4.5 2.73 7.61 1 12
+    C2.73 16.39 7 19.5 12 19.5
+    C17 19.5 21.27 16.39 23 12
+    C21.27 7.61 17 4.5 12 4.5
+    Z
+
+    M12 8
+    C9.79 8 8 9.79 8 12
+    C8 14.21 9.79 16 12 16
+    C14.21 16 16 14.21 16 12
+    C16 9.79 14.21 8 12 8
+    Z
+  `;
+
+  const svgContent = `
+    <defs>
+
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <linearGradient id="purpleGradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%">
+        <stop offset="0%" stop-color="#7a3cff"/>
+        <stop offset="50%" stop-color="#c77dff"/>
+        <stop offset="100%" stop-color="#7a3cff"/>
+      </linearGradient>
+
+    </defs>
+
+    <!-- Fundo -->
+    <rect
+      x="2"
+      y="2"
+      width="${width - 4}"
+      height="${height - 4}"
+      rx="18"
+      fill="#0d0b12"
+      stroke="#29183d"
+      stroke-width="2"
+    />
+
+    <!-- Linha superior -->
+    <line
+      x1="35"
+      y1="25"
+      x2="175"
+      y2="25"
+      stroke="url(#purpleGradient)"
+      stroke-width="2"
+      opacity="0.8"
+    />
+
+    <line
+      x1="${width - 175}"
+      y1="25"
+      x2="${width - 35}"
+      y2="25"
+      stroke="url(#purpleGradient)"
+      stroke-width="2"
+      opacity="0.8"
+    />
+
+    <!-- Brilho da linha -->
+    <line
+      x1="35"
+      y1="25"
+      x2="175"
+      y2="25"
+      stroke="#b56cff"
+      stroke-width="4"
+      opacity="0.25"
+      filter="url(#glow)"
+    />
+
+    <line
+      x1="${width - 175}"
+      y1="25"
+      x2="${width - 35}"
+      y2="25"
+      stroke="#b56cff"
+      stroke-width="4"
+      opacity="0.25"
+      filter="url(#glow)"
+    />
+
+    <!-- Arco segmentado -->
+    <g filter="url(#glow)">
+      ${gauge}
+    </g>
+
+    <!-- Olho -->
+    <g transform="translate(${centerX - 18}, 55) scale(1.5)">
+      <path
+        d="${eyePath}"
+        fill="none"
+        stroke="#c77dff"
+        stroke-width="1.5"
+      />
+
+      <circle
+        cx="12"
+        cy="12"
+        r="3"
+        fill="#c77dff"
+      />
+    </g>
+
+    <!-- Número -->
+    <text
+      x="${centerX}"
+      y="128"
+      text-anchor="middle"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="38"
+      font-weight="700"
+      fill="#ffffff"
+    >
+      ${countStr}
+    </text>
+
+    <!-- Label -->
+    <text
+      x="${centerX}"
+      y="153"
+      text-anchor="middle"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="11"
+      font-weight="600"
+      letter-spacing="3"
+      fill="#b56cff"
+    >
+      VISUALIZAÇÕES DO PERFIL
+    </text>
+
+    <!-- Linha inferior -->
+    <line
+      x1="115"
+      y1="169"
+      x2="405"
+      y2="169"
+      stroke="url(#purpleGradient)"
+      stroke-width="1.5"
+      opacity="0.7"
+    />
+
+    <!-- Pequenos detalhes laterais -->
+    <circle
+      cx="95"
+      cy="169"
+      r="2"
+      fill="#b56cff"
+    />
+
+    <circle
+      cx="425"
+      cy="169"
+      r="2"
+      fill="#b56cff"
+    />
+  `;
 
   res.setHeader('Content-Type', 'image/svg+xml');
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.send(`<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">${svgContent}</svg>`);
+
+  res.send(`
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="${width}"
+      height="${height}"
+      viewBox="0 0 ${width} ${height}"
+    >
+      ${svgContent}
+    </svg>
+  `);
 };
