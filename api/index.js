@@ -29,7 +29,13 @@ module.exports = async (req, res) => {
   const username = (q.username || '').trim().toLowerCase();
   if (!username) {
     res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader(
+  'Cache-Control',
+  'no-cache, no-store, must-revalidate, max-age=0'
+);
+
+res.setHeader('Pragma', 'no-cache');
+res.setHeader('Expires', '0');
     return res.status(400).send(`
       <svg xmlns="http://www.w3.org/2000/svg" width="200" height="30">
         <text x="5" y="20" font-family="monospace" font-size="13" fill="#f78166">
