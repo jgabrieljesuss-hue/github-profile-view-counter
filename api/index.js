@@ -96,20 +96,20 @@ module.exports = async (req, res) => {
   // ==============================
 
   const width = 520;
-  const height = 210;
+  const height = 200;
 
   const centerX = width / 2;
 
   // Centro do arco
-  const gaugeCenterY = 145;
+  const gaugeCenterY = 148;
 
   // Arco semicircular superior
   const segments = 14;
   const startAngle = 200;
   const endAngle = 340;
 
-  const outerRadius = 125;
-  const innerRadius = 103;
+  const outerRadius = 132;
+  const innerRadius = 108;
 
   // Quantidade de segmentos acesos
   const activeSegments = Math.min(segments, rawCount);
@@ -150,7 +150,7 @@ module.exports = async (req, res) => {
         stroke="${active ? '#b56cff' : '#321d48'}"
         stroke-width="7"
         stroke-linecap="round"
-        opacity="${active ? '1' : '0.75'}"
+        opacity="${active ? '1' : '0.45'}"
         ${active ? 'filter="url(#glow)"' : ''}
       />
     `;
@@ -269,11 +269,28 @@ module.exports = async (req, res) => {
 
     <g
       transform="
-        translate(${centerX - 18}, 68)
-        scale(1.5)
+        translate(${centerX - 17}, 69)
+        scale(1.4)
       "
-      filter="url(#glow)"
+      filter="url(#softGlow)"
     >
+
+    <filter id="softGlow"
+        x="-100%"
+        y="-100%"
+        width="300%"
+        height="300%">
+
+  <feGaussianBlur
+    stdDeviation="2"
+    result="blur"/>
+
+  <feMerge>
+    <feMergeNode in="blur"/>
+    <feMergeNode in="SourceGraphic"/>
+  </feMerge>
+
+</filter>
 
       <path
         d="${eyePath}"
@@ -296,10 +313,10 @@ module.exports = async (req, res) => {
 
     <text
       x="${centerX}"
-      y="139"
+      y="143"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
-      font-size="38"
+      font-size="42"
       font-weight="700"
       fill="#ffffff">
 
@@ -312,7 +329,7 @@ module.exports = async (req, res) => {
 
     <text
       x="${centerX}"
-      y="164"
+      y="168"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
       font-size="11"
@@ -329,9 +346,9 @@ module.exports = async (req, res) => {
 
     <line
       x1="120"
-      y1="183"
+      y1="180"
       x2="400"
-      y2="183"
+      y2="180"
       stroke="url(#purpleGradient)"
       stroke-width="1.5"
       opacity="0.75"
@@ -339,7 +356,7 @@ module.exports = async (req, res) => {
 
     <circle
       cx="100"
-      cy="183"
+      cy="180"
       r="2"
       fill="#b56cff"
       filter="url(#glow)"
@@ -347,7 +364,7 @@ module.exports = async (req, res) => {
 
     <circle
       cx="420"
-      cy="183"
+      cy="180"
       r="2"
       fill="#b56cff"
       filter="url(#glow)"
