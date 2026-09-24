@@ -101,7 +101,7 @@ module.exports = async (req, res) => {
   const centerX = width / 2;
 
   // Centro do arco
-  const gaugeCenterY = 148;
+  const gaugeCenterY = 144;
 
   // Arco semicircular superior
   const segments = 14;
