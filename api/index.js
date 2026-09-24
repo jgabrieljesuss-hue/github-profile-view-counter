@@ -411,3 +411,4 @@ module.exports = async (req, res) => {
 
     </svg>
   `);
+};
