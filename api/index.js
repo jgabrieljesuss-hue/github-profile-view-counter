@@ -91,8 +91,8 @@ module.exports = async (req, res) => {
   const fullTextW = tw(fullText, fontSize);
   const iconW     = showIcon ? iconSize : 0;
 
-  // ==============================
-  // VISUAL NEON DO CONTADOR - V2
+    // ==============================
+  // VISUAL NEON DO CONTADOR - V3
   // ==============================
 
   const width = 420;
@@ -100,23 +100,25 @@ module.exports = async (req, res) => {
 
   const centerX = width / 2;
 
-  // Centro do arco
-  const gaugeCenterY = 144;
+  // ==============================
+  // ARCO
+  // ==============================
 
-  // Arco semicircular superior
+  const gaugeCenterY = 112;
+
   const segments = 14;
   const startAngle = 200;
   const endAngle = 340;
 
-  const outerRadius = 132;
-  const innerRadius = 108;
+  const outerRadius = 94;
+  const innerRadius = 76;
 
-  // Quantidade de segmentos acesos
   const activeSegments = Math.min(segments, rawCount);
 
   let gauge = '';
 
   for (let i = 0; i < segments; i++) {
+
     const angle =
       startAngle +
       ((endAngle - startAngle) / (segments - 1)) * i;
@@ -148,7 +150,7 @@ module.exports = async (req, res) => {
         x2="${x2}"
         y2="${y2}"
         stroke="${active ? '#b56cff' : '#321d48'}"
-        stroke-width="7"
+        stroke-width="6"
         stroke-linecap="round"
         opacity="${active ? '1' : '0.45'}"
         ${active ? 'filter="url(#glow)"' : ''}
@@ -159,16 +161,20 @@ module.exports = async (req, res) => {
   const svgContent = `
     <defs>
 
-      <!-- Brilho neon -->
-      <filter id="glow"
-              x="-100%"
-              y="-100%"
-              width="300%"
-              height="300%">
+      <!-- Brilho principal -->
+
+      <filter
+        id="glow"
+        x="-100%"
+        y="-100%"
+        width="300%"
+        height="300%"
+      >
 
         <feGaussianBlur
-          stdDeviation="4"
-          result="blur"/>
+          stdDeviation="3"
+          result="blur"
+        />
 
         <feMerge>
           <feMergeNode in="blur"/>
@@ -177,25 +183,54 @@ module.exports = async (req, res) => {
 
       </filter>
 
-      <!-- Gradiente roxo -->
+
+      <!-- Brilho suave do olho -->
+
+      <filter
+        id="softGlow"
+        x="-100%"
+        y="-100%"
+        width="300%"
+        height="300%"
+      >
+
+        <feGaussianBlur
+          stdDeviation="2"
+          result="blur"
+        />
+
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+
+      </filter>
+
+
+      <!-- Gradiente -->
+
       <linearGradient
         id="purpleGradient"
         x1="0%"
         y1="0%"
         x2="100%"
-        y2="0%">
+        y2="0%"
+      >
 
         <stop
           offset="0%"
-          stop-color="#7a3cff"/>
+          stop-color="#7a3cff"
+        />
 
         <stop
           offset="50%"
-          stop-color="#d18aff"/>
+          stop-color="#d18aff"
+        />
 
         <stop
           offset="100%"
-          stop-color="#7a3cff"/>
+          stop-color="#7a3cff"
+        />
 
       </linearGradient>
 
@@ -209,7 +244,7 @@ module.exports = async (req, res) => {
       y="2"
       width="${width - 4}"
       height="${height - 4}"
-      rx="20"
+      rx="18"
       fill="#0c0911"
       stroke="#321d48"
       stroke-width="2"
@@ -219,46 +254,46 @@ module.exports = async (req, res) => {
     <!-- LINHAS SUPERIORES -->
 
     <line
-      x1="35"
-      y1="25"
-      x2="180"
-      y2="25"
+      x1="28"
+      y1="20"
+      x2="145"
+      y2="20"
       stroke="url(#purpleGradient)"
-      stroke-width="2"
+      stroke-width="1.5"
       opacity="0.8"
     />
 
     <line
-      x1="${width - 180}"
-      y1="25"
-      x2="${width - 35}"
-      y2="25"
+      x1="${width - 145}"
+      y1="20"
+      x2="${width - 28}"
+      y2="20"
       stroke="url(#purpleGradient)"
-      stroke-width="2"
+      stroke-width="1.5"
       opacity="0.8"
     />
 
 
-    <!-- PEQUENOS DETALHES NAS EXTREMIDADES -->
+    <!-- PONTOS SUPERIORES -->
 
     <circle
-      cx="32"
-      cy="25"
-      r="2"
+      cx="25"
+      cy="20"
+      r="1.7"
       fill="#b56cff"
-      filter="url(#glow)"
+      filter="url(#softGlow)"
     />
 
     <circle
-      cx="${width - 32}"
-      cy="25"
-      r="2"
+      cx="${width - 25}"
+      cy="20"
+      r="1.7"
       fill="#b56cff"
-      filter="url(#glow)"
+      filter="url(#softGlow)"
     />
 
 
-    <!-- ARCO NEON -->
+    <!-- ARCO -->
 
     <g>
       ${gauge}
@@ -269,28 +304,11 @@ module.exports = async (req, res) => {
 
     <g
       transform="
-        translate(${centerX - 17}, 69)
-        scale(1.4)
+        translate(${centerX - 14}, 57)
+        scale(1.15)
       "
       filter="url(#softGlow)"
     >
-
-    <filter id="softGlow"
-        x="-100%"
-        y="-100%"
-        width="300%"
-        height="300%">
-
-  <feGaussianBlur
-    stdDeviation="2"
-    result="blur"/>
-
-  <feMerge>
-    <feMergeNode in="blur"/>
-    <feMergeNode in="SourceGraphic"/>
-  </feMerge>
-
-</filter>
 
       <path
         d="${eyePath}"
@@ -313,12 +331,13 @@ module.exports = async (req, res) => {
 
     <text
       x="${centerX}"
-      y="110"
+      y="116"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
-      font-size="36"
+      font-size="32"
       font-weight="700"
-      fill="#ffffff">
+      fill="#ffffff"
+    >
 
       ${countStr}
 
@@ -329,13 +348,14 @@ module.exports = async (req, res) => {
 
     <text
       x="${centerX}"
-      y="135"
+      y="137"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
-      font-size="9"
+      font-size="8"
       font-weight="600"
-      letter-spacing="2"
-      fill="#b56cff">
+      letter-spacing="1.8"
+      fill="#b56cff"
+    >
 
       VISUALIZAÇÕES DO PERFIL
 
@@ -345,34 +365,35 @@ module.exports = async (req, res) => {
     <!-- LINHA INFERIOR -->
 
     <line
-      x1="120"
-      y1="180"
-      x2="400"
-      y2="180"
+      x1="98"
+      y1="147"
+      x2="322"
+      y2="147"
       stroke="url(#purpleGradient)"
-      stroke-width="1.5"
+      stroke-width="1"
       opacity="0.75"
     />
 
     <circle
-      cx="100"
-      cy="180"
-      r="2"
+      cx="80"
+      cy="147"
+      r="1.7"
       fill="#b56cff"
-      filter="url(#glow)"
+      filter="url(#softGlow)"
     />
 
     <circle
-      cx="420"
-      cy="180"
-      r="2"
+      cx="340"
+      cy="147"
+      r="1.7"
       fill="#b56cff"
-      filter="url(#glow)"
+      filter="url(#softGlow)"
     />
 
   `;
 
   res.setHeader('Content-Type', 'image/svg+xml');
+
   res.setHeader(
     'Cache-Control',
     'no-cache, no-store, must-revalidate'
@@ -390,4 +411,3 @@ module.exports = async (req, res) => {
 
     </svg>
   `);
-};
