@@ -313,10 +313,10 @@ module.exports = async (req, res) => {
 
     <text
       x="${centerX}"
-      y="143"
+      y="112"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
-      font-size="42"
+      font-size="36"
       font-weight="700"
       fill="#ffffff">
 
@@ -329,12 +329,12 @@ module.exports = async (req, res) => {
 
     <text
       x="${centerX}"
-      y="168"
+      y="135"
       text-anchor="middle"
       font-family="Arial, Helvetica, sans-serif"
-      font-size="11"
+      font-size="9"
       font-weight="600"
-      letter-spacing="3"
+      letter-spacing="2"
       fill="#b56cff">
 
       VISUALIZAÇÕES DO PERFIL
