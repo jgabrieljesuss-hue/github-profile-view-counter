@@ -104,9 +104,9 @@ module.exports = async (req, res) => {
   const gaugeCenterY = 148;
 
   // Arco semicircular superior
-  const segments = 12;
-  const startAngle = 180;
-  const endAngle = 320;
+  const segments = 14;
+  const startAngle = 200;
+  const endAngle = 340;
 
   const outerRadius = 132;
   const innerRadius = 108;
