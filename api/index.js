@@ -95,8 +95,8 @@ module.exports = async (req, res) => {
   // VISUAL NEON DO CONTADOR - V2
   // ==============================
 
-  const width = 520;
-  const height = 200;
+  const width = 420;
+  const height = 160;
 
   const centerX = width / 2;
 
